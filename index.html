@@ -3,21 +3,53 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Ejemplo IA</title>
-  <link rel="stylesheet" href="styles.css" />
+  <title>Taller-aplicaciones</title>
+  <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
 
-  <div class="navbar">
-    <button id="btn-inicio" class="active">Inicio</button>
-    <button id="btn-trabajos">Trabajos</button>
-  </div>
+<header>
+  <div class="logo">Inicio</div>
+  <nav>
+    
+    <a href="como_usar.html">Como usar</a>
+    <a href="que_es.html">¿Qué es Github?</a>
+    <a href="mis_trabajos.html">Mis trabajos</a>
+  </nav>
+</header>
 
-  <div class="container" id="content">
-    <!-- Aquí cargará el contenido -->
-  </div>
+<main class="inicio-main">
 
-  <script src="script.js"></script>
+  <section class="intro-section">
+    <div class="intro-text">
+      <p>Hola bienvenidos a GitHub</p>
+      <h1>aprende crea proyectos</h1>
+      <h2>y programa</h2>
+      <div class="animated-underline"></div>
+    </div>
+    <div class="intro-img-container">
+      <img src="Imagenes-taller/I-principal.png" alt="Diego principal" id="movible-img" />
+    </div>
+  </section>
 
+  <section class="github-links big-img-links">
+    <a href="https://github.com/usuario1" target="_blank">
+      <img src="Imagenes-taller/Git.png" alt="GitHub 1" class="link-img bounce-slow" />
+    </a>
+    <a href="https://github.com/usuario2" target="_blank">
+      <img src="Imagenes-taller/Github.png" alt="GitHub 2" class="link-img bounce" />
+    </a>
+    <a href="https://github.com/usuario3" target="_blank">
+      <img src="Imagenes-taller/Tutorial-github.png" alt="GitHub 3" class="link-img bounce-delay" />
+    </a>
+  </section>
+
+</main>
+
+<footer>
+  <p>&copy; 2025 Taller-aplicaciones. Todos los derechos reservados.</p>
+</footer>
+
+<script src="js/script.js"></script>
 </body>
 </html>

@@ -1,41 +1,77 @@
-const content = document.getElementById('content');
-const btnInicio = document.getElementById('btn-inicio');
-const btnTrabajos = document.getElementById('btn-trabajos');
+// PARA HACER MOVER LA IMAGEN PRINCIPAL DE INICIO (movible con mouse o tactil)
 
-// Contenido Inicio
-const contenidoInicio = `
-  <div class="info-box">
-    <h2>Información sobre Inteligencia Artificial</h2>
-    <p>La inteligencia artificial (IA) es una rama de la informática que se enfoca en la creación de sistemas capaces de realizar tareas que normalmente requieren inteligencia humana, como el aprendizaje, razonamiento y resolución de problemas.</p>
-  </div>
-`;
+const movibleImg = document.getElementById('movible-img');
 
-// Función para mostrar Inicio
-function mostrarInicio() {
-  content.innerHTML = contenidoInicio;
-  btnInicio.classList.add('active');
-  btnTrabajos.classList.remove('active');
-}
+if (movibleImg) {
+  let isDragging = false;
+  let startX, startY, currentX = 0, currentY = 0;
 
-// Función para mostrar Trabajos con semanas 1 a 8
-function mostrarTrabajos() {
-  let html = '';
-  for (let i = 1; i <= 8; i++) {
-    html += `
-      <div class="semana-card">
-        <h3>Semana ${i}</h3>
-        <p>Aquí va la descripción o contenido para la semana ${i}.</p>
-      </div>
-    `;
+  movibleImg.style.transform = `translate(0px, 0px)`;
+
+  movibleImg.addEventListener('mousedown', startDrag);
+  movibleImg.addEventListener('touchstart', startDrag, {passive:true});
+
+  window.addEventListener('mouseup', endDrag);
+  window.addEventListener('touchend', endDrag);
+
+  window.addEventListener('mousemove', drag);
+  window.addEventListener('touchmove', drag, {passive:false});
+
+  function startDrag(e) {
+    e.preventDefault();
+    isDragging = true;
+    const pos = e.type === 'touchstart' ? e.touches[0] : e;
+    startX = pos.clientX - currentX;
+    startY = pos.clientY - currentY;
+    movibleImg.style.transition = 'none';
+    movibleImg.style.cursor = 'grabbing';
   }
-  content.innerHTML = html;
-  btnTrabajos.classList.add('active');
-  btnInicio.classList.remove('active');
+
+  function drag(e) {
+    if (!isDragging) return;
+    e.preventDefault();
+    const pos = e.type === 'touchmove' ? e.touches[0] : e;
+    currentX = pos.clientX - startX;
+    currentY = pos.clientY - startY;
+
+    // Limitar el movimiento para que no se salga demasiado
+    const maxMove = 50;
+    currentX = Math.min(maxMove, Math.max(-maxMove, currentX));
+    currentY = Math.min(maxMove, Math.max(-maxMove, currentY));
+
+    movibleImg.style.transform = `translate(${currentX}px, ${currentY}px)`;
+  }
+
+  function endDrag(e) {
+    if (!isDragging) return;
+    isDragging = false;
+    // Vuelve a la posición original al soltar con animación suave
+    movibleImg.style.transition = 'transform 0.5s ease';
+    movibleImg.style.transform = `translate(0px, 0px)`;
+    movibleImg.style.cursor = 'grab';
+  }
 }
 
-// Event Listeners para botones
-btnInicio.addEventListener('click', mostrarInicio);
-btnTrabajos.addEventListener('click', mostrarTrabajos);
+// Puedes agregar más funciones JS para animaciones o interacciones si deseas, por ejemplo, textos que tiemblan o pequeñas animaciones extras.
 
-// Mostrar Inicio por defecto al cargar la página
-mostrarInicio();
+/* EJEMPLO: Texto que se mueve un poco (puedes añadir clase "move-text" en etiquetas que quieras animar) */
+
+const animatedTexts = document.querySelectorAll('.move-text');
+let animDirection = 1;
+let animPos = 0;
+let animMax = 10;
+
+function animateTexts() {
+  animPos += 0.2 * animDirection;
+  if (animPos > animMax || animPos < -animMax) animDirection *= -1;
+
+  animatedTexts.forEach(el => {
+    el.style.transform = `translateX(${animPos}px)`;
+  });
+
+  requestAnimationFrame(animateTexts);
+}
+
+if(animatedTexts.length > 0) {
+  animateTexts();
+}
