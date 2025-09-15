@@ -38,9 +38,16 @@ header {
 
 header .logo {
   font-weight: 900;
+  
   color: white;
   font-size: 1.5rem;
 }
+
+.logo {
+  color: white;        /* Color blanco */
+  text-decoration: none;   /* Quitar el subrayado */
+}
+
 
 header nav a {
   color: white;
@@ -67,6 +74,7 @@ footer {
 
 /* --- INICIO --- */
 .inicio-main {
+    text-decoration: none;
   flex-grow: 1;
   padding: 2rem;
   display: flex;
@@ -148,7 +156,7 @@ footer {
   gap: 3rem;
   justify-content: center;
   width: 100%;
-  max-width: 1000px;
+  max-width: 1500px;
 }
 
 .github-links a {
@@ -223,6 +231,7 @@ footer {
 }
 
 .github-logo {
+
   width: 250px;
   height: auto;
   flex-shrink: 0;
