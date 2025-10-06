@@ -28,7 +28,7 @@ header{
 }
 
 header.sticky{
-    background-color: #3a6cf4;
+    background-color: #021647;
     padding: 10px 200px;
 }
 
@@ -53,11 +53,11 @@ header .navigation a{
 }
 
 header .navigation a:hover{
-    color: #3a6cf4;
+    color: #061a50;
 }
 
 header.sticky .navigation a:hover{
-    color: black;
+    color: rgb(45, 18, 90);
 }
 
 section{
@@ -159,7 +159,7 @@ section{
 
 .btn{
     color: white;
-    background-color: #3a6cf4;
+    background-color: #071b55;
     font-size: 1em;
     font-weight: 600;
     display: inline-block;
@@ -173,7 +173,7 @@ section{
 }
 
 .btn:hover{
-    background-color: #235bf6;
+    background-color: #180e46;
 }
 
 .media-icons{
@@ -181,7 +181,7 @@ section{
 }
 
 .media-icons a{
-    color: white;
+    color: rgb(37, 4, 112);
     font-size: 25px;
     margin-right: 30px;
 }
@@ -212,7 +212,7 @@ section{
     left: 50%;
     width: 140px;
     height: 4px;
-    background-color: #3a6cf4;
+    background-color: #1d0457;
     transform: translateX(-50%);
 }
 
@@ -224,7 +224,7 @@ section{
     width: 15px;
     height: 15px;
     border-radius: 50%;
-    background-color: #3a6cf4;
+    background-color: #1e0558;
     transform: translateX(-50%);
 }
 
@@ -324,7 +324,7 @@ section{
     position: relative;
     width: 100%;
     height: 15px;
-    background-color: #ccc;
+    background-color: #450d8d;
     border-radius: 2px;
 }
 
@@ -379,7 +379,7 @@ section{
 }
 
 .services .content .card{
-    background-color: #fff;
+    background-color: #15066b;
     width: 340px;
     margin: 10px;
     padding: 25px;
@@ -388,12 +388,12 @@ section{
     align-items: center;
     flex-direction: column;
     border-radius: 10px;
-    box-shadow: 0 5px 25px rgba(1 1 1/15%);
+    box-shadow: 0 5px 25px rgba(60, 3, 134, 0.15);
     transition: 0.3s linear;
 }
 
 .services .content .card .service-icon{
-    color: #3a6cf4;
+    color: #5108da;
     font-size: 8rem;
     text-align: center;
     transition: 0.3s linear;
@@ -427,7 +427,7 @@ section{
 /* Work */
 
 .work{
-    background-color: #000016;
+    background-color: #03034e;
 }
 
 .work .content{
@@ -485,7 +485,7 @@ section{
   }
   
   .contact .content .row .card{
-    background: #fff;
+    background: #3104ad;
     width: 240px;
     margin: 20px;
     padding: 25px;
@@ -534,7 +534,7 @@ section{
   }
   
   .contact-form h3{
-    color: #111;
+    color: #0f0775;
     font-size: 1.6em;
     font-weight: 600;
     text-align: center;
@@ -575,13 +575,13 @@ section{
   }
   
   .contact-form .input-box .send-btn:hover{
-    background: #235bf6;
+    background: #1e06a1;
   }
 
   /* Footer */
   
   .footer{
-    background: #000016;
+    background: #2a06ad;
     color: #fff;
     text-align: center;
     padding: 2em;
