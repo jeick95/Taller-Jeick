@@ -1,0 +1,72 @@
+-- Crear la base de datos
+CREATE DATABASE colegio_db;
+USE colegio_db;
+
+-- Tabla de Estudiantes
+CREATE TABLE Estudiantes (
+    id_estudiante INT AUTO_INCREMENT PRIMARY KEY,
+    dni VARCHAR(15) NOT NULL UNIQUE,
+    nombres VARCHAR(100) NOT NULL,
+    apellidos VARCHAR(100) NOT NULL,
+    fecha_nacimiento DATE,
+    direccion VARCHAR(150)
+);
+
+-- Tabla de Cursos
+CREATE TABLE Cursos (
+    id_curso INT AUTO_INCREMENT PRIMARY KEY,
+    nombre_curso VARCHAR(100) NOT NULL,
+    descripcion TEXT
+);
+
+-- Tabla de Matrículas
+CREATE TABLE Matriculas (
+    id_matricula INT AUTO_INCREMENT PRIMARY KEY,
+    id_estudiante INT,
+    id_curso INT,
+    fecha_matricula DATE DEFAULT (CURRENT_DATE),
+    FOREIGN KEY (id_estudiante) REFERENCES Estudiantes(id_estudiante),
+    FOREIGN KEY (id_curso) REFERENCES Cursos(id_curso)
+);
+
+-- Tabla de Asistencias
+CREATE TABLE Asistencias (
+    id_asistencia INT AUTO_INCREMENT PRIMARY KEY,
+    id_estudiante INT,
+    id_curso INT,
+    fecha DATE NOT NULL,
+    presente BOOLEAN DEFAULT TRUE,
+    FOREIGN KEY (id_estudiante) REFERENCES Estudiantes(id_estudiante),
+    FOREIGN KEY (id_curso) REFERENCES Cursos(id_curso)
+);
+
+-- Tabla de Notas
+CREATE TABLE Notas (
+    id_nota INT AUTO_INCREMENT PRIMARY KEY,
+    id_estudiante INT,
+    id_curso INT,
+    evaluacion VARCHAR(50),
+    nota DECIMAL(5,2),
+    FOREIGN KEY (id_estudiante) REFERENCES Estudiantes(id_estudiante),
+    FOREIGN KEY (id_curso) REFERENCES Cursos(id_curso)
+);
+
+-- Insertar algunos datos de ejemplo
+INSERT INTO Estudiantes (dni, nombres, apellidos, fecha_nacimiento, direccion)
+VALUES ('12345678', 'Carlos', 'Ramírez', '2005-04-12', 'Av. Los Olivos 123'),
+       ('87654321', 'María', 'González', '2006-09-22', 'Jr. Las Flores 456');
+
+INSERT INTO Cursos (nombre_curso, descripcion)
+VALUES ('Matemática', 'Curso de álgebra y aritmética'),
+       ('Comunicación', 'Curso de lectura y redacción');
+
+INSERT INTO Matriculas (id_estudiante, id_curso)
+VALUES (1, 1), (2, 2);
+
+INSERT INTO Asistencias (id_estudiante, id_curso, fecha, presente)
+VALUES (1, 1, '2025-10-13', TRUE),
+       (2, 2, '2025-10-13', FALSE);
+
+INSERT INTO Notas (id_estudiante, id_curso, evaluacion, nota)
+VALUES (1, 1, 'Examen Parcial', 16.5),
+       (2, 2, 'Examen Parcial', 14.0);
