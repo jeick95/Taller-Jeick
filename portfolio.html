@@ -4,36 +4,225 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EdwinCoward</title>
+    <title>Tareas por Semanas - DESARROLLO DE APLICACIONES 1</title>
 
-    <!-- Link Swiper's CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.css" />
 
-    <!--Bootstrap ================================================== -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
 
-    <!--vendor css ================================================== -->
     <link rel="stylesheet" type="text/css" href="css/vendor.css">
 
 
-    <!--Styles css ================================================== -->
     <link rel="stylesheet" href="styles.css">
 
 
-    <!--Google Font css ================================================== -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
         href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap"
         rel="stylesheet">
+
+    <style>
+        /* Estilos base tomados de tu index.html */
+        :root {
+            --primary-color: #55c7a5;
+            /* Color verde/lima ajustado */
+            --secondary-color: #2c3e50;
+            --background-color: #1a1a1a;
+            --text-color: #f0f0f0;
+            --card-background: #4a455e;
+            --header-background: #121212;
+            --progress-color: var(--primary-color);
+            /* Color de la barra de progreso */
+        }
+
+        /* Estilos específicos para la página de Tareas */
+
+        /* Usa la misma fuente y fondo que el index */
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-image: url(images/background.jpg);
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: cover;
+            color: var(--text-color);
+        }
+
+        #task-content {
+            padding: 50px 0;
+            /* Asegura espacio suficiente */
+            min-height: 100vh;
+            margin-left: 100px;
+            /* Deja espacio para el menú lateral */
+        }
+
+        .section-title {
+            color: var(--primary-color);
+            text-align: center;
+            margin-bottom: 50px;
+            font-weight: 700;
+        }
+
+        /* Estilo para las tarjetas de Semana (Grid) */
+        .semana-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .semana {
+            background-color: var(--card-background);
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(155, 33, 33, 0.5);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .semana:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.7);
+        }
+
+        .semana-header {
+            cursor: pointer;
+            padding: 15px;
+            background-color: var(--header-background);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            transition: background-color 0.3s ease;
+        }
+
+        .semana-header.active {
+            background-color: var(--secondary-color);
+        }
+
+        .semana-header h3 {
+            margin: 0;
+            font-size: 1.25rem;
+            color: var(--text-color);
+            transition: color 0.3s ease;
+        }
+
+        .semana-header .github-link {
+            font-size: 1.5rem;
+            color: var(--primary-color);
+            transition: transform 0.3s ease;
+        }
+
+        .semana-header .github-link:hover {
+            transform: scale(1.1);
+        }
+
+        /* Progreso y Barra */
+        .progreso-container {
+            margin: 10px 15px;
+            height: 8px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progreso-barra {
+            height: 100%;
+            width: 0%;
+            background-color: var(--progress-color);
+            transition: width 0.4s ease;
+        }
+
+        /* Contenido de las tareas (Acordeón) */
+        .tareas {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease-out;
+            padding: 0 15px;
+        }
+
+        .tareas.show {
+            max-height: 1000px;
+            /* Suficiente para expandirse */
+            padding-bottom: 15px;
+        }
+
+        .tarea {
+            display: flex;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+            transition: background-color 0.2s ease;
+        }
+
+        .tarea:last-child {
+            border-bottom: none;
+        }
+
+        .tarea-completada .tarea-descripcion {
+            text-decoration: line-through;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .tarea-checkbox {
+            margin-right: 15px;
+            transform: scale(1.2);
+        }
+
+        .tarea-descripcion {
+            flex-grow: 1;
+            font-size: 0.95rem;
+        }
+
+        .tarea-acciones .btn {
+            font-size: 0.8rem;
+            padding: 5px 10px;
+            margin-left: 10px;
+            border: none;
+            background-color: var(--primary-color);
+            color: var(--background-color);
+            font-weight: 600;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        .tarea-acciones .btn:hover {
+            background-color: #4838a0;
+            /* Un poco más oscuro */
+        }
+
+        .tarea-img-container {
+            height: 150px;
+            overflow: hidden;
+            background-color: #000;
+        }
+
+        .tarea-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: grayscale(20%);
+            transition: filter 0.3s ease;
+        }
+
+        .semana:hover .tarea-img {
+            filter: grayscale(0%);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 991px) {
+            #task-content {
+                margin-left: 0;
+                /* Elimina el margen en móviles */
+                padding-top: 20px;
+            }
+        }
+    </style>
 </head>
 
-<body style="background-image: url(images/background.jpg);
-background-repeat: no-repeat;
-background-position: center;
-background-size: cover;">
-
+<body>
     <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
         <symbol id="page-add" viewBox="0 0 20 20">
             <path fill="currentColor"
@@ -118,6 +307,7 @@ background-size: cover;">
         </symbol>
     </svg>
 
+
     <div class="preloader">
         <div class="loader"></div>
     </div>
@@ -133,7 +323,6 @@ background-size: cover;">
             <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNavbar"
                 aria-labelledby="offcanvasNavbarLabel">
                 <div class="offcanvas-header">
-                    <!-- <h5 class="offcanvas-title" id="offcanvasNavbarLabel">Menu</h5> -->
                     <button type="button" class="btn-close text-reset shadow-none" data-bs-dismiss="offcanvas"
                         aria-label="Close"></button>
                 </div>
@@ -199,43 +388,23 @@ background-size: cover;">
             </div>
         </div>
     </nav>
-<!-- Imgen de hollon knight-->
-    <section id="hero" class="padding-large  position-relative">
-        <div class="container-fluid padding-side text-white">
-            <div class="d-none d-lg-block position-absolute bottom-0 end-0">
-                <img src="./images/baner-img_holow.png" alt="img" class="img-fluid">
-            </div>
-            <div class="row align-items-center">
-                <div class="col-lg-6 text-center d-lg-none" data-aos="fade-up" data-aos-duration="1400">
-                    <img src="./images/baner-img_holow.png" alt="img" class="img-fluid">
-                </div>
-                <div class="col-lg-6 ms-lg-5">
-                    <h2 class="banner-size fw-medium display-3 my-4" data-aos="fade-up" data-aos-duration="1200">
-                        Hola soy <span class="text-primary"> Aranda Navarro Jeick </span>
-                    </h2>
-                    <p data-aos="fade-up" data-aos-duration="1400">
-                        ¡Bienvenido a mi pagina web! Soy Aranda Navarro Jeick, 
-                        un diseñador apasionado dedicado a ofrecer soluciones innovadoras y de impacto. 
-                        Explora mis trabajos y creemos algo extraordinario juntos.
-                    </p>
-                    <a href="portfolio.html" class="btn button text-white mt-4 position-relative pe-5"
-                        data-aos="fade-up" data-aos-duration="1600">
-                        <span> Ver todos los Trabajos </span>
-                        <div class="position-absolute top-50 end-0 translate-middle-y me-3">
-                            <svg class="arrow-right text-white p-1" width="28" height="28">
-                                <use xlink:href="#arrow-right"></use>
-                            </svg>
-                        </div>
-                    </a>
-                </div>
-            </div>
+
+    <section id="task-content" class="container">
+        <header class="text-center mb-5">
+            <h1 class="section-title display-5">Tareas por Semanas</h1>
+            <h2 class="text-white">DESARROLLO DE APLICACIONES 1</h2>
+            <p class="text-muted">Autor: Aranda Navarro Jeick</p>
+        </header>
+
+        <div id="semanas-container" class="semana-grid">
         </div>
+
     </section>
-    <!--menu de pantalla-->
+
     <nav id="side-nav" class="navbar-side p-3 p-lg-4 me-lg-5" data-bs-theme="dark">
         <ul class="navbar-nav">
             <li class="nav-item">
-                <a class="nav-link active" aria-current="page" href="index.html">
+                <a class="nav-link" href="index.html">
                     <svg width="24" height="24">
                         <use xlink:href="#home"></use>
                     </svg>
@@ -255,7 +424,13 @@ background-size: cover;">
                     </svg>
                 </a>
             </li>
-            
+            <li class="nav-item">
+                <a class="nav-link" href="reseñas.html">
+                    <svg width="24" height="24">
+                        <use xlink:href="#testimonial"></use>
+                    </svg>
+                </a>
+            </li>
             <li class="nav-item">
                 <a class="nav-link" href="contactos.html">
                     <svg width="24" height="24">
@@ -264,42 +439,252 @@ background-size: cover;">
                 </a>
             </li>
             <li class="dropdown">
-                <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button"
+                <a class="nav-link dropdown-toggle active" data-bs-toggle="dropdown" href="#" role="button"
                     aria-expanded="false">
                     <svg width="24" height="24">
                         <use xlink:href="#page-add"></use>
                     </svg></a>
                 <ul class="dropdown-menu">
                     <li><a href="blog.html" class="dropdown-item">Blog <span class="badge bg-dark">Trabajos</span></a></li>
-                    
                     <li><a href="services.html" class="dropdown-item">Servicios <span
                                 class="badge bg-dark">Trabajos</span></a></li>
-                   
                     <li><a href="portfolio-details.html" class="dropdown-item">Portfolio-Detalles
                             <span class="badge bg-dark">Trabajos</span></a></li>
+                    <li><a href="tareas.html" class="dropdown-item active">Tareas <span
+                                class="badge bg-primary">NEW</span></a></li>
                 </ul>
             </li>
         </ul>
     </nav>
 
-    <!-- script ================================================== -->
-    <script src="js/jquery-1.11.0.min.js"></script>
+    <footer class="text-center py-3" style="background-color: var(--header-background); color: var(--text-color);">
+        <p class="mb-0">© 2024 Taller-Jeick. Todos los derechos reservados.</p>
+    </footer>
 
-    <!-- Bootstarp script ================================================== -->
+    <script src="js/jquery-1.11.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe"
         crossorigin="anonymous"></script>
-
-    <!-- Swiper script ================================================== -->
     <script src="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.js"></script>
-
-    <!--iconify script ================================================== -->
     <script src="https://cdn.jsdelivr.net/npm/iconify-icon@1.0.7/dist/iconify-icon.min.js"></script>
-
-
     <script src="js/plugins.js"></script>
     <script src="js/script.js"></script>
 
+    <script>
+    // Array de datos de tareas, incluyendo enlaces y descripciones
+    const tareasData = [
+        {
+            semana: 1,
+            titulo: "¿Qué es Git? y Fundamentos de Programación",
+            descripcion: "Conceptos básicos de Git y ejercicios iniciales del curso, incluyendo variables y estructuras de control.",
+            imagen: "https://i.blogs.es/0427e3/hollow-knight--0-/1200_800.jpeg",
+            githubRepo: "https://github.com/jeick95/Taller-Jeick/tree/main/Archivos-clase/semana1",
+            tareas: [
+                { nombre: "Introducción a Git y GitHub", archivo: "Archivos-clase/semana1/Semana01_Actividad_2025.pdf" },
+                { nombre: "Ejercicios de Variables en JS", archivo: "Archivos-clase/semana1/Semana01_Actividad_2025.pdf" }
+            ]
+        },
+        {
+            semana: 2,
+            titulo: "Estructuras de Control y Funciones en JavaScript",
+            descripcion: "Implementación de condicionales (if/else, switch) y bucles (for, while), además de la creación y uso de funciones.",
+            imagen: "https://alfabetajuega.com/hero/2021/07/hollow-knight.jpg?width=1200&aspect_ratio=16:9",
+            githubRepo: "https://github.com/jeick95/Taller-Jeick/tree/main/Archivos-clase/semana2",
+            tareas: [
+                { nombre: "Práctica de Condicionales", archivo: "Archivos-clase/semana2/Semana02_Actividad_2025.pdf" },
+                { nombre: "Desarrollo de Funciones Reutilizables", archivo: "Archivos-clase/semana2/Semana02_Actividad_2025.pdf" }
+            ]
+        },
+        // Nota: He modificado la propiedad 'archivo' en tareasData para que contenga
+        // la ruta completa desde la raíz del repositorio, simplificando la función crearTarjetaSemana.
+        // Las demás semanas se mantuvieron con la estructura original que ya funcionaba en la implementación anterior.
+        {
+            semana: 3,
+            titulo: "Arreglos (Arrays) y Manipulación del DOM",
+            descripcion: "Uso de arreglos para listas de datos y la manipulación de elementos HTML/CSS con JavaScript (DOM).",
+            imagen: "https://assetsio.gnwcdn.com/how-hollow-knights-community-crafted-gibberish-into-a-real-language-1567781461548.jpg?width=690&quality=85&format=jpg&auto=webp",
+            githubRepo: "https://github.com/jeick95/Taller-Jeick/tree/main/Archivos-clase/semana3",
+            tareas: [
+                { nombre: "Gestión de Listas con Arrays", archivo: "Archivos-clase/semana3/Semana03_Actividad_2025.pdf" },
+                { nombre: "Creación Dinámica de Elementos HTML", archivo: "Archivos-clase/semana3/Semana03_Actividad_2025.pdf" }
+            ]
+        },
+        {
+            semana: 4,
+            titulo: "Programación Orientada a Objetos (POO)",
+            descripcion: "Introducción a Clases, Objetos, Herencia y Polimorfismo en JavaScript moderno.",
+            imagen: "https://i.ytimg.com/vi/6VELngPxeiE/maxresdefault.jpg",
+            githubRepo: "https://github.com/jeick95/Taller-Jeick/tree/main/Archivos-clase/semana4",
+            tareas: [
+                { nombre: "Diseño de Clases y Objetos", archivo: "Archivos-clase/semana4/tarea_s04_clases.pdf" },
+                { nombre: "Ejercicio de Herencia y Polimorfismo", archivo: "Archivos-clase/semana4/tarea_s04_herencia.pdf" }
+            ]
+        },
+        {
+            semana: 5,
+            titulo: "Eventos y Formularios Web",
+            descripcion: "Manejo de eventos del usuario (clics, mousemove) y validación de formularios complejos.",
+            imagen: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT5eYxeKWV3RTNqGxOxUNXXJWPjrG9H7drpMQ&s",
+            githubRepo: "https://github.com/jeick95/Taller-Jeick/tree/main/Archivos-clase/semana5",
+            tareas: [
+                { nombre: "Creación de un Validador de Formulario", archivo: "semana5/PRUEBA%20DE%20FUNCIONANMIENTO%20DEL%20LOGIN%20.pdf" },
+                { nombre: "Mini-Juego basado en Eventos", archivo: "semana5/PRUEBA%20DE%20FUNCIONANMIENTO%20DEL%20LOGIN%20.pdf" }
+            ]
+        },
+        {
+            semana: 6,
+            titulo: "Introducción al Front-End y Base de Datos (MOCK)",
+            descripcion: "Maquetación inicial de un proyecto Front-End y simulación de datos de backend (MOCK data).",
+            imagen: "https://blogger.googleusercontent.com/img/a/AVvXsEh43OYtFXAiwsCdU4TLg5LbNUiawnvhZcUe2F_HE7roBaThFO2UF5S015LJj5B7zrmqEK6KE_UyQkfvk79cYsJntaq5-vPxSQBbzRZ33jLg6VHipivJIqysgGO4svaXy5Y8-xwV3NStG_mTeB04H8ru-yzT3-66vPRvzgDW-OfTcYIDvMcJ7-UguBsi=s2048",
+            githubRepo: "https://github.com/jeick95/Taller-Jeick/tree/main/Archivos-clase/semana6",
+            tareas: [
+                { nombre: "Estructura HTML/CSS del Proyecto Final", archivo: "Archivos-clase/semana6/BASE%20DE%20DATOS%20DE%20LA%20PAGINA.pdf" },
+                { nombre: "Simulación de Conexión a Base de Datos (JSON)", archivo: "Archivos-clase/semana6/BASE%20DE%20DATOS%20DE%20LA%20PAGINA.pdf" }
+            ]
+        },
+        {
+            semana: 7,
+            titulo: "APIs y Fetching de Datos (Asincronía)",
+            descripcion: "Uso de promesas, `fetch` y `async/await` para obtener datos de APIs externas (ej. Pokémon API).",
+            imagen: "https://pbs.twimg.com/media/GKACkNvW8AA_aPj?format=jpg&name=large",
+            githubRepo: "https://github.com/jeick95/Taller-Jeick/tree/main/Archivos-clase/semana7",
+            tareas: [
+                { nombre: "Consumo de API Externa (Proyecto Práctico)", archivo: "Archivos-clase/semana7/tarea_s07_api_consume.pdf" },
+                { nombre: "Refactorización a Async/Await", archivo: "Archivos-clase/semana7/tarea_s07_async_await.pdf" }
+            ]
+        },
+        {
+            semana: 8,
+            titulo: "Proyecto Final y Despliegue",
+            descripcion: "Entrega del proyecto final del curso y despliegue inicial en una plataforma de hosting (ej. GitHub Pages).",
+            imagen: "https://imagenes.elpais.com/resizer/v2/Q2SQEBBHJ5FRBEZXZGIW6WVCQQ.jpeg?auth=16591cf712022fc6ca98fb4c5c0e981903f213b63594637c5688690122758c53&width=1200",
+            githubRepo: "https://github.com/jeick95/Taller-Jeick/tree/main/Archivos-clase/semana8",
+            tareas: [
+                { nombre: "Revisión Final del Código y Estilo", archivo: "Archivos-clase/semana8/tarea_s08_code_review.pdf" },
+                { nombre: "Documentación y Despliegue del Proyecto", archivo: "Archivos-clase/semana8/tarea_s08_deployment.pdf" }
+            ]
+        }
+    ];
+
+    // Función para generar una tarjeta de semana
+    function crearTarjetaSemana(data) {
+        // NOTA: Para simplificar, la ruta completa del archivo (ej. Archivos-clase/semana1/tarea_s01_intro_git.pdf)
+        // se ha movido directamente a la propiedad `archivo` de `tareasData`.
+        // Esto evita la manipulación compleja de strings de URL aquí.
+
+        const tareasHtml = data.tareas.map((tarea, index) => `
+            <div class="tarea" data-tarea-index="${index}">
+                <input type="checkbox" class="tarea-checkbox" onclick="marcarTarea(this)">
+                <span class="tarea-descripcion">${tarea.nombre}</span>
+                <div class="tarea-acciones">
+                    <a href="${data.githubRepo}" target="_blank" class="btn btn-sm btn-github">
+                        <svg width="16" height="16"><use xlink:href="#github-mark"></use></svg> GitHub
+                    </a>
+                    <a href="#" 
+                       class="btn btn-sm btn-pdf" 
+                       onclick="descargarArchivo('${tarea.archivo}'); return false;">
+                        Descargar PDF
+                    </a>
+                </div>
+            </div>
+        `).join('');
+
+        return `
+            <div class="semana" id="semana-${data.semana}">
+                <div class="tarea-img-container">
+                    <img src="${data.imagen}" alt="Imagen Semana ${data.semana}" class="tarea-img">
+                </div>
+                <div class="semana-header" onclick="toggleTareas(this)">
+                    <h3 class="semana-titulo">Semana ${data.semana}: ${data.titulo}</h3>
+                    <a href="${data.githubRepo}" target="_blank" class="github-link" title="Ver repositorio de la semana">
+                        <svg width="24" height="24"><use xlink:href="#github-mark"></use></svg>
+                    </a>
+                </div>
+                <div class="progreso-container">
+                    <div class="progreso-barra" style="width: 0%;"></div>
+                </div>
+                <div class="tareas">
+                    <p class="p-3 text-muted">${data.descripcion}</p>
+                    ${tareasHtml}
+                </div>
+            </div>
+        `;
+    }
+
+    // 1. Carga automática de tarjetas
+    document.addEventListener('DOMContentLoaded', () => {
+        const contenedor = document.getElementById('semanas-container');
+        if (contenedor) {
+            contenedor.innerHTML = tareasData.map(crearTarjetaSemana).join('');
+            // Inicializar el progreso para todas las semanas
+            document.querySelectorAll('.semana').forEach(actualizarProgreso);
+        }
+    });
+
+    // 2. Desplegar tareas
+    // Función global llamada desde el HTML (onclick)
+    function toggleTareas(titulo) {
+        const semana = titulo.closest('.semana');
+        const tareas = semana.querySelector('.tareas');
+        
+        if (tareas.classList.contains('show')) {
+            tareas.classList.remove('show');
+            titulo.classList.remove('active');
+            // Esto es solo para que la animación de max-height se vea bien
+            tareas.style.maxHeight = null;
+        } else {
+            // Es necesario recalcular el scrollHeight para que la transición funcione correctamente
+            tareas.style.maxHeight = tareas.scrollHeight + "px";
+            tareas.classList.add('show');
+            titulo.classList.add('active');
+        }
+    }
+
+    // 3. Marcar completadas
+    // Función global llamada desde el HTML (onclick)
+    function marcarTarea(checkbox) {
+        const tarea = checkbox.closest('.tarea');
+        const semana = checkbox.closest('.semana');
+
+        if (checkbox.checked) {
+            tarea.classList.add('tarea-completada');
+        } else {
+            tarea.classList.remove('tarea-completada');
+        }
+        actualizarProgreso(semana);
+    }
+
+    // 4. Barra de progreso
+    function actualizarProgreso(semana) {
+        const totalTareas = semana.querySelectorAll('.tarea').length;
+        const tareasCompletadas = semana.querySelectorAll('.tarea-completada').length;
+
+        if (totalTareas === 0) return;
+
+        const porcentaje = (tareasCompletadas / totalTareas) * 100;
+        const barra = semana.querySelector('.progreso-barra');
+        barra.style.width = `${porcentaje.toFixed(0)}%`;
+    }
+
+    // 5. Botones funcionales (Descargar) - Implementación que usa su URL
+    // Función global llamada desde el HTML (onclick)
+    function descargarArchivo(rutaArchivo) {
+        // URL base que usted solicitó: https://raw.githubusercontent.com/FrankDiegoMatiasUrcuhuaranga/TALLER/main/
+        // La rutaArchivo ahora contiene el path completo del archivo (ej. Archivos-clase/semana1/tarea_s01_intro_git.pdf)
+        const githubRawUrl = `https://github.com/jeick95/Taller-Jeick/tree/main/${rutaArchivo}`;
+        
+        // El link resultante para la primera tarea será exactamente:
+        // https://raw.githubusercontent.com/FrankDiegoMatiasUrcuhuaranga/TALLER/main/Archivos-clase/semana1/tarea_s01_intro_git.pdf
+        
+        window.open(githubRawUrl, '_blank');
+    }
+
+    // Se asegura que la barra de navegación se mantenga en oscuro para que se vea el menú lateral
+    if(document.getElementById('side-nav')) {
+        document.getElementById('side-nav').setAttribute('data-bs-theme', 'dark');
+    }
+
+</script>
 </body>
 
 </html>
