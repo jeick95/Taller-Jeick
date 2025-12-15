@@ -210,12 +210,16 @@ background-attachment: fixed;">
                     <div class="row content-row">
                         <div class="col-lg-6 mb-5 mb-lg-0">
                             <p class="text-content-about mb-5">
-                                Hola, soy Aranda Navarro Jeick, un diseñador profesional con 15 años de experiencia. 
-                                Me especializo en ux/ui, logotipos, branding, web y gráfico, impulsado 
-                                por una pasión por el cambio en esta industria. Mi enfoque combina 
-                                creatividad, estrategia y una meticulosa atención al detalle para producir 
-                                resultados excepcionales. Ya sea en diseño, me esfuerzo por hacer que cada 
-                                proyecto se destaque.
+                                GitHub es una plataforma colaborativa basada en Git que permite almacenar, gestionar y compartir 
+                                proyectos de software. Facilita el control de versiones, la organización del código y la colaboración 
+                                entre desarrolladores de todo el mundo.</p>
+                                En GitHub, cada proyecto se guarda en un repositorio, donde los usuarios pueden trabajar con ramas, 
+                                realizar commits, fusionar cambios y crear solicitudes de extracción (pull requests). Además, incluye 
+                                herramientas como Issues para reportar errores, Actions para automatizar procesos y Pages para alojar 
+                                sitios web.</p>
+                                Su propósito es impulsar el trabajo en equipo, la transparencia y la mejora continua en cada línea de 
+                                ódigo. GitHub no solo es una herramienta técnica, sino también una comunidad global que fomenta la 
+                                innovación y el aprendizaje colaborativo.
                             </p>
 
                             <div class="row stats-container">
@@ -295,12 +299,109 @@ background-attachment: fixed;">
                                         </div>
                                     </div>
                                 </div>
-                                <div class="tab-pane fade" id="experience" role="tabpanel" aria-labelledby="experience-tab">
-                                    <p class="text-content-about">Contenido de Experiencia para Jeick... 1. GIT HUB Y GIT</p>
-                                </div>
+                                <div class="tab-pane fade show active" id="experience" role="tabpanel" aria-labelledby="experience-tab">
+  <h3 class="text-warning">💻 Flujo básico de trabajo con GitHub</h3>
+  <ol class="text-content-about">
+    <li><strong>Crea un repositorio nuevo en GitHub.</strong><br>
+      Desde la web: selecciona <b>New</b>, escribe el nombre del repositorio, elige si será público o privado y haz clic en <b>Create repository</b>.
+    </li>
+
+    <li><strong>Clona el repositorio en tu PC.</strong>
+      <pre><code>git clone https://github.com/usuario/nombre-del-proyecto.git
+cd nombre-del-proyecto</code></pre>
+    </li>
+
+    <li><strong>Crea una nueva rama (opcional pero recomendable).</strong>
+      <pre><code>git checkout -b feature/nueva-funcion</code></pre>
+      Trabaja en una rama para no modificar directamente la rama principal (<b>main</b>).
+    </li>
+
+    <li><strong>Actualiza tu rama local con los últimos cambios.</strong>
+      <pre><code>git fetch origin
+git pull origin main</code></pre>
+      Si estás en otra rama:
+      <pre><code>git checkout main
+git pull origin main
+git checkout feature/nueva-funcion
+git merge main</code></pre>
+    </li>
+
+    <li><strong>Realiza los cambios en tu código.</strong><br>
+      Modifica, agrega o elimina archivos según lo que necesites.
+    </li>
+
+    <li><strong>Agrega los archivos modificados al área de preparación (staging).</strong>
+      <pre><code>git add .</code></pre>
+      También puedes agregar un archivo específico:
+      <pre><code>git add nombre-del-archivo.ext</code></pre>
+    </li>
+
+    <li><strong>Haz un commit con un mensaje claro.</strong>
+      <pre><code>git commit -m "Agrego la función de búsqueda"</code></pre>
+      Usa mensajes descriptivos y cortos.
+    </li>
+
+    <li><strong>Sube (push) tus cambios al repositorio remoto.</strong>
+      <pre><code>git push origin feature/nueva-funcion</code></pre>
+    </li>
+
+    <li><strong>Crea un Pull Request (PR) en GitHub.</strong><br>
+      Entra a tu repositorio → pestaña <b>Pull requests</b> → <b>New pull request</b>.<br>
+      Selecciona tu rama y describe los cambios realizados.<br>
+      Asigna revisores o etiquetas si trabajas en equipo.
+    </li>
+
+    <li><strong>Espera la revisión del código (code review).</strong><br>
+      Otros desarrolladores revisan tu PR, comentan y pueden solicitar ajustes.<br>
+      Si te piden cambios:
+      <pre><code>git add .
+git commit -m "Correcciones solicitadas"
+git push origin feature/nueva-funcion</code></pre>
+    </li>
+
+    <li><strong>Fusiona (merge) la Pull Request cuando esté aprobada.</strong><br>
+      En GitHub, haz clic en <b>Merge pull request</b> → <b>Confirm merge</b>.<br>
+      También puedes hacerlo desde consola:
+      <pre><code>git checkout main
+git merge feature/nueva-funcion
+git push origin main</code></pre>
+    </li>
+
+    <li><strong>Actualiza tu rama principal (main) localmente.</strong>
+      <pre><code>git checkout main
+git pull origin main</code></pre>
+    </li>
+
+    <li><strong>Elimina la rama usada (opcional, para mantener orden).</strong>
+      <pre><code>git push origin --delete feature/nueva-funcion
+git branch -d feature/nueva-funcion</code></pre>
+    </li>
+  </ol>
+</div>
+<!--link del video-->
                                 <div class="tab-pane fade" id="education" role="tabpanel" aria-labelledby="education-tab">
-                                    <p class="text-content-about">Contenido de Educación para Jeick... CONLA GUIA DE VIDEOS PASO A PASO</p>
-                                </div>
+  <p class="text-content-about">
+    <strong>Contenido de Educación para Jeick — Guía con videos paso a paso</strong><br><br>
+    En este video se explica cómo usar GitHub desde cero: crear un repositorio, clonarlo, hacer commits,
+    subir cambios y colaborar con otros usuarios. Ideal para principiantes que desean dominar Git y GitHub
+    con ejemplos prácticos.
+  </p>
+
+  <!-- Video embebido de YouTube -->
+  <div class="ratio ratio-16x9 mt-3">
+    <iframe 
+      width="560" 
+      height="315" 
+      src="https://www.youtube.com/watch?v=vlCXdvcgiE0&list=PL3OJzSGOgFonPpXSeciO7PlxsDiqj4FNH&index=6" 
+      title="Curso de Git y GitHub paso a paso"
+      frameborder="0"
+      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+      allowfullscreen>
+    </iframe>
+  </div>
+</div>
+
+
                                 <div class="tab-pane fade" id="interests" role="tabpanel" aria-labelledby="interests-tab">
                                     <p class="text-content-about">Contenido de Intereses para Jeick... EN PROGRAMCION Y DISEÑO DE PAGINAS</p>
                                 </div>
