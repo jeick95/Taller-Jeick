@@ -1,0 +1,368 @@
+-- -----------------------------------------------------
+-- Script para crear la Base de Datos: gestion_tesis_db
+-- Basado en los 9 modelos Java (MVC)
+-- -----------------------------------------------------
+
+-- 1. CREACIÓN DE LA BASE DE DATOS
+DROP SCHEMA IF EXISTS `gestion_tesis_db`;
+CREATE SCHEMA IF NOT EXISTS `gestion_tesis_db` DEFAULT CHARACTER SET utf8mb4 ;
+USE `gestion_tesis_db` ;
+
+-- -----------------------------------------------------
+-- Tabla 1: `usuarios` (Modelo: Usuario.java)
+-- Tabla base que almacena los datos comunes de login.
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `usuarios` (
+  `idUsuario` INT NOT NULL AUTO_INCREMENT,
+  `nombreUsuario` VARCHAR(50) NOT NULL,
+  `contrasena` VARCHAR(255) NOT NULL, -- Debe ser larga para el hash (SHA-256)
+  `nombre` VARCHAR(100) NOT NULL,
+  `apellido` VARCHAR(100) NOT NULL,
+  `email` VARCHAR(100) NOT NULL,
+  `rol` ENUM('estudiante', 'docente', 'admin') NOT NULL,
+  `fotoPerfilUrl` VARCHAR(255) NULL DEFAULT 'default.png',
+  `activo` TINYINT(1) NOT NULL DEFAULT 1, -- 1=Activo, 0=Inactivo
+  PRIMARY KEY (`idUsuario`),
+  UNIQUE INDEX `email_UNIQUE` (`email` ASC),
+  UNIQUE INDEX `nombreUsuario_UNIQUE` (`nombreUsuario` ASC)
+) ENGINE = InnoDB;
+
+-- -----------------------------------------------------
+-- Tabla 2: `estudiantes` (Modelo: Estudiante.java)
+-- Extiende de 'usuarios'. Almacena datos solo de estudiantes.
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `estudiantes` (
+  `idEstudiante` INT NOT NULL, -- Es el mismo ID que idUsuario (Llave Primaria y Foránea)
+  `codigoEstudiante` VARCHAR(20) NOT NULL,
+  `carrera` VARCHAR(100) NULL,
+  PRIMARY KEY (`idEstudiante`),
+  UNIQUE INDEX `codigoEstudiante_UNIQUE` (`codigoEstudiante` ASC),
+  CONSTRAINT `fk_estudiantes_usuarios`
+    FOREIGN KEY (`idEstudiante`)
+    REFERENCES `usuarios` (`idUsuario`)
+    ON DELETE CASCADE -- Si se borra el usuario, se borra el estudiante
+    ON UPDATE CASCADE
+) ENGINE = InnoDB;
+
+-- -----------------------------------------------------
+-- Tabla 3: `docentes` (Modelo: Docente.java)
+-- Extiende de 'usuarios'. Almacena datos solo de docentes.
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `docentes` (
+  `idDocente` INT NOT NULL, -- Es el mismo ID que idUsuario
+  `departamento` VARCHAR(100) NULL,
+  `especialidad` VARCHAR(100) NULL,
+  PRIMARY KEY (`idDocente`),
+  CONSTRAINT `fk_docentes_usuarios`
+    FOREIGN KEY (`idDocente`)
+    REFERENCES `usuarios` (`idUsuario`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+) ENGINE = InnoDB;
+
+-- -----------------------------------------------------
+-- Tabla 4: `tesis` (Modelo: Tesis.java)
+-- La tabla principal que conecta todo.
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `tesis` (
+  `idTesis` INT NOT NULL AUTO_INCREMENT,
+  `titulo` VARCHAR(255) NOT NULL,
+  `descripcion` TEXT NULL,
+  `fechaSubida` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `estado` ENUM('Pendiente', 'En Revisión', 'Requiere Correcciones', 'Aprobado', 'Rechazado') NOT NULL DEFAULT 'Pendiente',
+  `urlArchivo` VARCHAR(255) NULL,
+  `fechaProximaRevision` DATE NULL, -- Para el calendario y panel del docente
+  `idEstudianteAutor` INT NOT NULL,
+  `idDocenteRevisor` INT NULL, -- Es NULLABLE, porque el admin lo asigna después
+  PRIMARY KEY (`idTesis`),
+  INDEX `fk_tesis_estudiantes_idx` (`idEstudianteAutor` ASC),
+  INDEX `fk_tesis_docentes_idx` (`idDocenteRevisor` ASC),
+  CONSTRAINT `fk_tesis_estudiantes`
+    FOREIGN KEY (`idEstudianteAutor`)
+    REFERENCES `estudiantes` (`idEstudiante`)
+    ON DELETE NO ACTION -- No dejar borrar un estudiante si tiene tesis
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_tesis_docentes`
+    FOREIGN KEY (`idDocenteRevisor`)
+    REFERENCES `docentes` (`idDocente`)
+    ON DELETE SET NULL -- Si se borra el docente, la tesis queda "Sin Asignar"
+    ON UPDATE CASCADE
+) ENGINE = InnoDB;
+
+-- -----------------------------------------------------
+-- Tabla 5: `comentarios` (Modelo: Comentario.java)
+-- Almacena los comentarios de revisión del docente.
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `comentarios` (
+  `idComentario` INT NOT NULL AUTO_INCREMENT,
+  `texto` TEXT NOT NULL,
+  `fechaHora` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `idTesis` INT NOT NULL,
+  `idDocenteAutor` INT NOT NULL,
+  PRIMARY KEY (`idComentario`),
+  INDEX `fk_comentarios_tesis_idx` (`idTesis` ASC),
+  INDEX `fk_comentarios_docentes_idx` (`idDocenteAutor` ASC),
+  CONSTRAINT `fk_comentarios_tesis`
+    FOREIGN KEY (`idTesis`)
+    REFERENCES `tesis` (`idTesis`)
+    ON DELETE CASCADE -- Si se borra la tesis, se borran sus comentarios
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_comentarios_docentes`
+    FOREIGN KEY (`idDocenteAutor`)
+    REFERENCES `docentes` (`idDocente`)
+    ON DELETE NO ACTION -- No dejar borrar al docente si tiene comentarios
+    ON UPDATE CASCADE
+) ENGINE = InnoDB;
+
+-- -----------------------------------------------------
+-- Tabla 6: `mensajes` (Modelo: Mensaje.java)
+-- Para la mensajería interna entre usuarios.
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `mensajes` (
+  `idMensaje` INT NOT NULL AUTO_INCREMENT,
+  `asunto` VARCHAR(255) NULL,
+  `cuerpo` TEXT NULL,
+  `fechaHoraEnvio` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `leido` TINYINT(1) NOT NULL DEFAULT 0,
+  `idRemitente` INT NOT NULL,
+  `idDestinatario` INT NOT NULL,
+  PRIMARY KEY (`idMensaje`),
+  INDEX `fk_mensajes_remitente_idx` (`idRemitente` ASC),
+  INDEX `fk_mensajes_destinatario_idx` (`idDestinatario` ASC),
+  CONSTRAINT `fk_mensajes_remitente`
+    FOREIGN KEY (`idRemitente`)
+    REFERENCES `usuarios` (`idUsuario`)
+    ON DELETE NO ACTION
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_mensajes_destinatario`
+    FOREIGN KEY (`idDestinatario`)
+    REFERENCES `usuarios` (`idUsuario`)
+    ON DELETE NO ACTION
+    ON UPDATE CASCADE
+) ENGINE = InnoDB;
+
+-- -----------------------------------------------------
+-- Tabla 7: `evento_calendario` (Modelo: EventoCalendario.java)
+-- Para eventos generales del calendario (ej. "Sustentaciones").
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `evento_calendario` (
+  `idEvento` INT NOT NULL AUTO_INCREMENT,
+  `titulo` VARCHAR(100) NOT NULL,
+  `descripcion` TEXT NULL,
+  `fechaEvento` DATE NOT NULL,
+  `tipo` VARCHAR(50) NULL DEFAULT 'General',
+  PRIMARY KEY (`idEvento`)
+) ENGINE = InnoDB;
+
+-- -----------------------------------------------------
+-- Tabla 8: `historial_estado` (Modelo: HistorialEstado.java)
+-- Guarda el "timeline" de una tesis.
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `historial_estado` (
+  `idHistorial` INT NOT NULL AUTO_INCREMENT,
+  `fechaCambio` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `estadoNuevo` VARCHAR(50) NOT NULL,
+  `notas` VARCHAR(255) NULL,
+  `idTesis` INT NOT NULL,
+  `idUsuarioModificador` INT NOT NULL,
+  PRIMARY KEY (`idHistorial`),
+  INDEX `fk_historial_tesis_idx` (`idTesis` ASC),
+  INDEX `fk_historial_usuarios_idx` (`idUsuarioModificador` ASC),
+  CONSTRAINT `fk_historial_tesis`
+    FOREIGN KEY (`idTesis`)
+    REFERENCES `tesis` (`idTesis`)
+    ON DELETE CASCADE -- Si se borra la tesis, se borra su historial
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_historial_usuarios`
+    FOREIGN KEY (`idUsuarioModificador`)
+    REFERENCES `usuarios` (`idUsuario`)
+    ON DELETE NO ACTION
+    ON UPDATE CASCADE
+) ENGINE = InnoDB;
+
+-- -----------------------------------------------------
+-- Tabla 9: `configuracion_sistema` (Modelo: ConfiguracionSistema.java)
+-- Guarda variables globales del sistema (logo, periodo, etc.)
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `configuracion_sistema` (
+  `idConfig` INT NOT NULL DEFAULT 1,
+  `nombreInstitucion` VARCHAR(255) NULL,
+  `logoUrl` VARCHAR(255) NULL DEFAULT 'logo_default.png',
+  `periodoAcademico` VARCHAR(50) NULL,
+  PRIMARY KEY (`idConfig`)
+) ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- -----------------------------------------------------
+-- INSERCIÓN DE DATOS DE EJEMPLO (SEED DATA)
+-- -----------------------------------------------------
+-- -----------------------------------------------------
+
+-- 1. Insertar la configuración inicial del sistema
+INSERT INTO `configuracion_sistema` (`idConfig`, `nombreInstitucion`, `logoUrl`, `periodoAcademico`)
+VALUES (1, 'Mi Universidad', 'logo_institucion.png', '2025-II');
+
+-- 2. Insertar un usuario Administrador
+-- Contraseña es 'admin' (hasheada con SHA2-256)
+INSERT INTO `usuarios` (`nombreUsuario`, `contrasena`, `nombre`, `apellido`, `email`, `rol`, `activo`)
+VALUES ('admin', '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918', 'Admin', 'Principal', 'admin@institucion.edu', 'admin', 1);
+
+-- 3. Insertar un usuario Docente
+-- Contraseña es 'docente' (hasheada con SHA2-256)
+INSERT INTO `usuarios` (`nombreUsuario`, `contrasena`, `nombre`, `apellido`, `email`, `rol`, `activo`)
+VALUES ('d.ramos', '6042de11b7f1c1c87c4f1c911e359f635c91e133c4f9f3f4a0a1f33f01c80f0c', 'Carlos', 'Ramos', 'c.ramos@institucion.edu', 'docente', 1);
+-- Insertar sus datos específicos de docente
+INSERT INTO `docentes` (`idDocente`, `departamento`, `especialidad`)
+VALUES (LAST_INSERT_ID(), 'Ciencias de la Computación', 'Inteligencia Artificial');
+
+-- 4. Insertar un usuario Estudiante
+-- Contraseña es 'alumno' (hasheada con SHA2-256)
+INSERT INTO `usuarios` (`nombreUsuario`, `contrasena`, `nombre`, `apellido`, `email`, `rol`, `activo`)
+VALUES ('a.garcia', 'fc9e4210c3f5af7f76d63b2f5670f5e1a6b83fbf46a2a07c0062c3e1b8a8cabc', 'Ana', 'García', 'a.garcia@alumnos.edu', 'estudiante', 1);
+-- Insertar sus datos específicos de estudiante
+INSERT INTO `estudiantes` (`idEstudiante`, `codigoEstudiante`, `carrera`)
+VALUES (LAST_INSERT_ID(), 'u202012345', 'Ingeniería de Sistemas');
+
+-- 5. Insertar una Tesis de ejemplo para Ana García, asignada al Dr. Ramos
+INSERT INTO `tesis` (`titulo`, `descripcion`, `estado`, `idEstudianteAutor`, `idDocenteRevisor`)
+VALUES 
+('Análisis de Algoritmos de IA para Mercados Emergentes', 
+'Un estudio profundo sobre...', 
+'En Revisión', 
+3, -- ID de Ana García
+2  -- ID de Dr. Ramos
+);
+
+-- 6. Insertar un historial para esa tesis
+INSERT INTO `historial_estado` (`estadoNuevo`, `notas`, `idTesis`, `idUsuarioModificador`)
+VALUES ('Pendiente', 'Tesis subida por administrador.', 1, 1); -- ID Tesis 1, Modificador Admin 1
+
+INSERT INTO `historial_estado` (`estadoNuevo`, `notas`, `idTesis`, `idUsuarioModificador`)
+VALUES ('En Revisión', 'Asignada a Dr. Ramos.', 1, 1); -- ID Tesis 1, Modificador Admin 1
+
+-- 7. Insertar un evento de calendario
+INSERT INTO `evento_calendario` (`titulo`, `fechaEvento`, `tipo`)
+VALUES ('Fecha límite entrega correcciones', '2025-12-01', 'Entrega Límite');
+
+COMMIT;
+
+SELECT * FROM usuarios;
+SELECT * FROM estudiantes;
+SELECT * FROM docentes;
+SELECT * FROM tesis;
+
+-- -----------------------------------------------------
+-- Script para AÑADIR MÁS DATOS de ejemplo
+-- -----------------------------------------------------
+USE `gestion_tesis_db` ;
+
+-- -----------------------------------------------------
+-- Insertar usuarios y roles ADICIONALES
+-- -----------------------------------------------------
+
+-- 1. Usuario Alumno: T1475 | Contraseña: T1475
+-- (Hash SHA-256 de 'T1475': 2a5c4373d5c9413b5d1959b860b769223e20058c40b8f08f1b21319c5c830f60)
+INSERT INTO `usuarios` (`nombreUsuario`, `contrasena`, `nombre`, `apellido`, `email`, `rol`, `activo`)
+VALUES ('T1475', '2a5c4373d5c9413b5d1959b860b769223e20058c40b8f08f1b21319c5c830f60', 'Juan', 'Perez', 'j.perez@alumnos.edu', 'estudiante', 1);
+SET @last_user_id = LAST_INSERT_ID();
+INSERT INTO `estudiantes` (`idEstudiante`, `codigoEstudiante`, `carrera`)
+VALUES (@last_user_id, 'T1475', 'Ingeniería de Software');
+
+-- 2. Usuario Docente: Estares | Contraseña: 12535
+-- (Hash SHA-256 de '12535': 2a70f3c604b66917a192e27306b3a31c53041f0217c13a0e606a6c1161a06a5b)
+INSERT INTO `usuarios` (`nombreUsuario`, `contrasena`, `nombre`, `apellido`, `email`, `rol`, `activo`)
+VALUES ('Estares', '2a70f3c604b66917a192e27306b3a31c53041f0217c13a0e606a6c1161a06a5b', 'Maria', 'Estares', 'm.estares@institucion.edu', 'docente', 1);
+SET @last_user_id = LAST_INSERT_ID();
+INSERT INTO `docentes` (`idDocente`, `departamento`, `especialidad`)
+VALUES (@last_user_id, 'Ciencias de Datos', 'Big Data');
+
+-- 3. Usuario Alumno Adicional (para tener más datos)
+-- (Contraseña: 'campus' -> f1c10712865d9c298043681e5b5658607a72d6229c15f5127344f6c4c01d418e)
+INSERT INTO `usuarios` (`nombreUsuario`, `contrasena`, `nombre`, `apellido`, `email`, `rol`, `activo`)
+VALUES ('l.campos', 'f1c10712865d9c298043681e5b5658607a72d6229c15f5127344f6c4c01d418e', 'Luis', 'Campos', 'l.campos@alumnos.edu', 'estudiante', 0); -- Inactivo
+SET @last_user_id = LAST_INSERT_ID();
+INSERT INTO `estudiantes` (`idEstudiante`, `codigoEstudiante`, `carrera`)
+VALUES (@last_user_id, 'u201954321', 'Ingeniería de Sistemas');
+
+-- 4. Usuario Docente Adicional (para tener más datos)
+-- (Contraseña: 'profe' -> a141c29e6c63a6a9b83b333cebde61f1c2b426090c239851608af3a1670acb45)
+INSERT INTO `usuarios` (`nombreUsuario`, `contrasena`, `nombre`, `apellido`, `email`, `rol`, `activo`)
+VALUES ('m.herrera', 'a141c29e6c63a6a9b83b333cebde61f1c2b426090c239851608af3a1670acb45', 'Marisol', 'Herrera', 'm.herrera@institucion.edu', 'docente', 1);
+SET @last_user_id = LAST_INSERT_ID();
+INSERT INTO `docentes` (`idDocente`, `departamento`, `especialidad`)
+VALUES (@last_user_id, 'Ciencias de la Computación', 'Ciberseguridad');
+
+
+-- -----------------------------------------------------
+-- Insertar Tesis Adicionales
+-- (IDs de usuarios: 1=Admin, 2=Ramos, 3=Ana, 4=Juan, 5=Estares, 6=Luis, 7=Herrera)
+-- -----------------------------------------------------
+
+-- Tesis para Juan Perez (ID 4), asignada a Maria Estares (ID 5)
+INSERT INTO `tesis` (`titulo`, `descripcion`, `estado`, `idEstudianteAutor`, `idDocenteRevisor`, `fechaProximaRevision`)
+VALUES ('Impacto del 5G en Zonas Rurales', 'Un análisis de conectividad y desarrollo social.', 'En Revisión', 4, 5, '2025-11-30');
+SET @tesis_id_2 = LAST_INSERT_ID();
+
+INSERT INTO `historial_estado` (`estadoNuevo`, `notas`, `idTesis`, `idUsuarioModificador`)
+VALUES ('Pendiente', 'Tesis subida por admin.', @tesis_id_2, 1);
+INSERT INTO `historial_estado` (`estadoNuevo`, `notas`, `idTesis`, `idUsuarioModificador`)
+VALUES ('En Revisión', 'Asignada a Maria Estares.', @tesis_id_2, 1);
+
+
+-- Tesis para Luis Campos (ID 6), asignada a Carlos Ramos (ID 2)
+INSERT INTO `tesis` (`titulo`, `descripcion`, `estado`, `idEstudianteAutor`, `idDocenteRevisor`, `fechaProximaRevision`)
+VALUES ('Optimización de Redes Neuronales para IoT', 'Desarrollo de un modelo ligero para dispositivos de borde.', 'Requiere Correcciones', 6, 2, '2025-11-25');
+SET @tesis_id_3 = LAST_INSERT_ID();
+
+INSERT INTO `historial_estado` (`estadoNuevo`, `notas`, `idTesis`, `idUsuarioModificador`)
+VALUES ('Pendiente', 'Tesis subida por admin.', @tesis_id_3, 1);
+INSERT INTO `historial_estado` (`estadoNuevo`, `notas`, `idTesis`, `idUsuarioModificador`)
+VALUES ('En Revisión', 'Asignada a Carlos Ramos.', @tesis_id_3, 1);
+INSERT INTO `historial_estado` (`estadoNuevo`, `notas`, `idTesis`, `idUsuarioModificador`)
+VALUES ('Requiere Correcciones', 'Docente envió comentarios.', @tesis_id_3, 2);
+
+
+-- Tesis para Ana García (ID 3), SIN ASIGNAR (Para probar la función del Admin)
+INSERT INTO `tesis` (`titulo`, `descripcion`, `estado`, `idEstudianteAutor`, `idDocenteRevisor`, `fechaProximaRevision`)
+VALUES ('Plataforma Web de Gestión Académica', 'Diseño e implementación de un sistema MVC con Java Servlets y JSP.', 'Pendiente', 3, NULL, NULL);
+SET @tesis_id_4 = LAST_INSERT_ID();
+
+INSERT INTO `historial_estado` (`estadoNuevo`, `notas`, `idTesis`, `idUsuarioModificador`)
+VALUES ('Pendiente', 'Tesis subida por admin. Esperando asignación.', @tesis_id_4, 1);
+
+
+-- -----------------------------------------------------
+-- Insertar Comentarios y Mensajes Adicionales
+-- -----------------------------------------------------
+
+-- Comentario del Dr. Ramos (ID 2) para la Tesis 3 (de Luis Campos)
+INSERT INTO `comentarios` (`texto`, `idTesis`, `idDocenteAutor`)
+VALUES ('Buen trabajo en el marco teórico. Sin embargo, la sección 3.2 (Metodología) está incompleta. Por favor, detalla el stack tecnológico que usaste y justifica la elección de TensorFlow Lite.', @tesis_id_3, 2);
+
+-- Mensaje del Estudiante Luis Campos (ID 6) al Docente Carlos Ramos (ID 2)
+INSERT INTO `mensajes` (`asunto`, `cuerpo`, `idRemitente`, `idDestinatario`, `leido`)
+VALUES ('Duda sobre correcciones (Tesis IoT)', 'Estimado Dr. Ramos, ¿podría darme más detalles sobre la corrección de la sección 3.2? ¿Necesita un diagrama de arquitectura? Gracias.', 6, 2, 0);
+
+-- Mensaje del Docente Carlos Ramos (ID 2) al Estudiante Luis Campos (ID 6)
+INSERT INTO `mensajes` (`asunto`, `cuerpo`, `idRemitente`, `idDestinatario`, `leido`)
+VALUES ('RE: Duda sobre correcciones', 'Luis, un diagrama de arquitectura sería excelente. Concéntrate en el flujo de datos. Saludos.', 2, 6, 0);
+
+
+-- -----------------------------------------------------
+-- Insertar Eventos de Calendario Adicionales
+-- -----------------------------------------------------
+INSERT INTO `evento_calendario` (`titulo`, `fechaEvento`, `tipo`)
+VALUES ('Inicio de Semana de Sustentaciones', '2025-12-10', 'Sustentacion');
+
+INSERT INTO `evento_calendario` (`titulo`, `fechaEvento`, `tipo`)
+VALUES ('Cierre de Periodo Académico 2025-II', '2025-12-20', 'General');
+
+
+COMMIT;
+
+-- Verificar los nuevos datos
+SELECT * FROM usuarios;
+SELECT * FROM tesis;
+SELECT * FROM comentarios;
+SELECT * FROM mensajes;
